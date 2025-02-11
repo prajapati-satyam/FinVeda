@@ -1,75 +1,48 @@
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("calculate-Btn3").addEventListener("click", function() {
-        const monthlyInstallment = parseFloat(document.getElementById("monthly-installment").value);
-        const annualInterestRate = parseFloat(document.getElementById("rate1").value);
-        const timePeriodMonths = parseFloat(document.getElementById("months1").value);
+function calculateRD() {
+    let amount = parseFloat(document.getElementById("monthly-installment").value);
+    let rate = parseFloat(document.getElementById("rate1").value) / 100;
+    let time = parseFloat(document.getElementById("months").value) / 12;
+    let n = 12;
 
-        // Clear previous error messages
-        clearErrorMessages();
+    let maturity = amount * ((Math.pow(1 + (rate / n), n * time) - 1) / (1 - Math.pow(1 + (rate / n), -1)));
 
-        // Validate inputs and display errors if any
-        const hasError = validateInputs(monthlyInstallment, annualInterestRate, timePeriodMonths);
-        if (hasError) return;
+    let totalInvestment = amount * (time * 12); 
+    let interestEarned = maturity - totalInvestment; 
 
-        const monthlyInterestRate = annualInterestRate / 12 / 100;
-        let maturityAmount = 0;
+        document.getElementById("interestEarned1").innerText = interestEarned.toFixed(2);
+        document.getElementById("maturityAmount1").innerText = maturity.toFixed(2);
+    
 
-        for (let i = 0; i < timePeriodMonths; i++) {
-            maturityAmount += monthlyInstallment * Math.pow((1 + monthlyInterestRate), (timePeriodMonths - i)); 
-        }
+    console.log('all done')
+}
 
-        const totalInvestAmount = monthlyInstallment * timePeriodMonths;
-        const interestEarned = maturityAmount - totalInvestAmount;
+function clearFields() {
+    document.getElementById("monthly-installment").value = "";
+    document.getElementById("rate1").value = "";
+    document.getElementById("months").value = "";
+    document.getElementById('calculate-rd').disabled = true
+    document.getElementById("interestEarned1").innerText = '';
+document.getElementById("maturityAmount1").innerText = '';
+    
+}
 
-        const formatter = new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR'
-        });
 
-        // Display formatted results
-        document.getElementById("interestEarned1").innerText = `Interest Earned: ${formatter.format(interestEarned)}`;
-        document.getElementById("maturityAmount1").innerText = `Maturity Amount: ${formatter.format(maturityAmount)}`;
-    });
-
-    document.getElementById("clearBtn2").addEventListener("click", function() {
-        clearInputs();
-    });
-
-    function validateInputs(monthlyInstallment, annualInterestRate, timePeriodMonths) {
-        let hasError = false;
-
-        if (isNaN(monthlyInstallment) || monthlyInstallment <= 0) {
-            showError('installmentError', 'Please enter a valid positive number for the monthly installment.');
-            hasError = true;
-        }
-        if (isNaN(annualInterestRate) || annualInterestRate <= 0) {
-            showError('rateError', 'Please enter a valid positive number for the annual interest rate.');
-            hasError = true;
-        }
-        if (isNaN(timePeriodMonths) || timePeriodMonths <= 0) {
-            showError('monthsError', 'Please enter a valid positive number for the time period in months.');
-            hasError = true;
-        }
-
-        return hasError;
+function disable() {
+    let amount =document.getElementById("monthly-installment").value;
+    let rate = document.getElementById("rate1").value;
+    let time = document.getElementById("months").value;
+    let calculate_rd_button = document.getElementById('calculate-rd');
+    if (amount.length < 1 ||rate.length < 1 || time.length < 1) {
+       calculate_rd_button.disabled = true
+    } else {
+        calculate_rd_button.disabled = false
     }
+    
+}
 
-    function showError(elementId, message) {
-        document.getElementById(elementId).textContent = message;
-    }
+document.getElementById('clear').addEventListener('click', clearFields)
+document.getElementById('calculate-rd').addEventListener('click', calculateRD)
 
-    function clearErrorMessages() {
-        document.getElementById('installmentError').textContent = '';
-        document.getElementById('rateError').textContent = '';
-        document.getElementById('monthsError').textContent = '';
-    }
-
-    function clearInputs() {
-        document.getElementById("monthly-installment").value = '';
-        document.getElementById("rate1").value = '';
-        document.getElementById("months1").value = '';
-        document.getElementById("interestEarned1").innerText = '';
-        document.getElementById("maturityAmount1").innerText = '';
-        clearErrorMessages();
-    }
-});
+document.getElementById("monthly-installment").addEventListener('input', disable);
+document.getElementById("rate1").addEventListener('input', disable);
+document.getElementById("months").addEventListener('input', disable);
